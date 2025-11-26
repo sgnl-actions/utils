@@ -141,7 +141,7 @@ describe('Auth Utilities', () => {
   describe('getAuthorizationHeader', () => {
     test('should return Bearer token from BEARER_TOKEN secret', async () => {
       const context = {
-        env: {},
+        environment: {},
         secrets: { BEARER_TOKEN: 'my-bearer-token' }
       };
 
@@ -151,7 +151,7 @@ describe('Auth Utilities', () => {
 
     test('should not double-prefix Bearer token', async () => {
       const context = {
-        env: {},
+        environment: {},
         secrets: { BEARER_TOKEN: 'Bearer already-prefixed' }
       };
 
@@ -161,7 +161,7 @@ describe('Auth Utilities', () => {
 
     test('should return Basic auth from username and password', async () => {
       const context = {
-        env: { BASIC_USERNAME: 'myuser' },
+        environment: { BASIC_USERNAME: 'myuser' },
         secrets: { BASIC_PASSWORD: 'mypassword' }
       };
 
@@ -175,7 +175,7 @@ describe('Auth Utilities', () => {
 
     test('should return Bearer token from OAuth2 Authorization Code', async () => {
       const context = {
-        env: {},
+        environment: {},
         secrets: { OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN: 'oauth2-auth-code-token' }
       };
 
@@ -190,7 +190,7 @@ describe('Auth Utilities', () => {
       });
 
       const context = {
-        env: {
+        environment: {
           OAUTH2_CLIENT_CREDENTIALS_TOKEN_URL: 'https://auth.example.com/token',
           OAUTH2_CLIENT_CREDENTIALS_CLIENT_ID: 'client-id'
         },
@@ -206,7 +206,7 @@ describe('Auth Utilities', () => {
 
     test('should throw error when no auth configured', async () => {
       const context = {
-        env: {},
+        environment: {},
         secrets: {}
       };
 
@@ -216,7 +216,7 @@ describe('Auth Utilities', () => {
 
     test('should throw error when OAuth2 Client Credentials missing TOKEN_URL', async () => {
       const context = {
-        env: {
+        environment: {
           OAUTH2_CLIENT_CREDENTIALS_CLIENT_ID: 'client-id'
         },
         secrets: {
@@ -239,7 +239,7 @@ describe('Auth Utilities', () => {
   describe('getBaseUrl', () => {
     test('should return address from params', () => {
       const params = { address: 'https://api.example.com' };
-      const context = { env: { ADDRESS: 'https://fallback.example.com' } };
+      const context = { environment: { ADDRESS: 'https://fallback.example.com' } };
 
       const url = getBaseUrl(params, context);
       expect(url).toBe('https://api.example.com');
@@ -247,7 +247,7 @@ describe('Auth Utilities', () => {
 
     test('should fall back to ADDRESS from env', () => {
       const params = {};
-      const context = { env: { ADDRESS: 'https://env.example.com' } };
+      const context = { environment: { ADDRESS: 'https://env.example.com' } };
 
       const url = getBaseUrl(params, context);
       expect(url).toBe('https://env.example.com');
@@ -255,7 +255,7 @@ describe('Auth Utilities', () => {
 
     test('should remove trailing slash', () => {
       const params = { address: 'https://api.example.com/' };
-      const context = { env: {} };
+      const context = { environment: {} };
 
       const url = getBaseUrl(params, context);
       expect(url).toBe('https://api.example.com');
@@ -263,14 +263,14 @@ describe('Auth Utilities', () => {
 
     test('should throw error when no URL available', () => {
       const params = {};
-      const context = { env: {} };
+      const context = { environment: {} };
 
       expect(() => getBaseUrl(params, context))
         .toThrow('No URL specified. Provide address parameter or ADDRESS environment variable');
     });
 
     test('should handle null params', () => {
-      const context = { env: { ADDRESS: 'https://env.example.com' } };
+      const context = { environment: { ADDRESS: 'https://env.example.com' } };
 
       const url = getBaseUrl(null, context);
       expect(url).toBe('https://env.example.com');
@@ -288,7 +288,7 @@ describe('Auth Utilities', () => {
   describe('createAuthHeaders', () => {
     test('should return headers object with Bearer auth', async () => {
       const context = {
-        env: {},
+        environment: {},
         secrets: { BEARER_TOKEN: 'test-token' }
       };
 
@@ -303,7 +303,7 @@ describe('Auth Utilities', () => {
 
     test('should return headers object with Basic auth', async () => {
       const context = {
-        env: { BASIC_USERNAME: 'user' },
+        environment: { BASIC_USERNAME: 'user' },
         secrets: { BASIC_PASSWORD: 'pass' }
       };
 
@@ -315,7 +315,7 @@ describe('Auth Utilities', () => {
     });
 
     test('should throw error when no auth configured', async () => {
-      const context = { env: {}, secrets: {} };
+      const context = { environment: {}, secrets: {} };
 
       await expect(createAuthHeaders(context))
         .rejects.toThrow('No authentication configured');

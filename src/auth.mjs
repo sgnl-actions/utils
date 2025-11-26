@@ -79,13 +79,13 @@ export async function getClientCredentialsToken(config) {
  * Get the Authorization header value from context using available auth method.
  * Supports: Bearer Token, Basic Auth, OAuth2 Authorization Code, OAuth2 Client Credentials
  *
- * @param {Object} context - Execution context with env and secrets
- * @param {Object} context.env - Environment variables
+ * @param {Object} context - Execution context with environment and secrets
+ * @param {Object} context.environment - Environment variables
  * @param {Object} context.secrets - Secret values
  * @returns {Promise<string>} Authorization header value (e.g., "Bearer xxx" or "Basic xxx")
  */
 export async function getAuthorizationHeader(context) {
-  const env = context.env || {};
+  const env = context.environment || {};
   const secrets = context.secrets || {};
 
   // Method 1: Simple Bearer Token
@@ -143,7 +143,7 @@ export async function getAuthorizationHeader(context) {
  * @returns {string} Base URL
  */
 export function getBaseUrl(params, context) {
-  const env = context.env || {};
+  const env = context.environment || {};
   const address = params?.address || env.ADDRESS;
 
   if (!address) {
