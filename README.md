@@ -78,7 +78,7 @@ const token = await getClientCredentialsToken({
 
 | Priority | Method | Environment Variables | Secrets |
 |----------|--------|----------------------|---------|
-| 1 | Bearer Token | - | `BEARER_TOKEN` |
+| 1 | Bearer Token | - | `BEARER_AUTH_TOKEN` |
 | 2 | Basic Auth | `BASIC_USERNAME` | `BASIC_PASSWORD` |
 | 3 | OAuth2 Authorization Code | - | `OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN` |
 | 4 | OAuth2 Client Credentials | `OAUTH2_CLIENT_CREDENTIALS_TOKEN_URL`, `OAUTH2_CLIENT_CREDENTIALS_CLIENT_ID`, `OAUTH2_CLIENT_CREDENTIALS_SCOPE`, `OAUTH2_CLIENT_CREDENTIALS_AUDIENCE`, `OAUTH2_CLIENT_CREDENTIALS_AUTH_STYLE` | `OAUTH2_CLIENT_CREDENTIALS_CLIENT_SECRET` |
