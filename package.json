@@ -1,0 +1,30 @@
+{
+  "name": "@sgnl-actions/utils",
+  "version": "1.0.0",
+  "description": "Shared utilities for SGNL actions",
+  "type": "module",
+  "main": "src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./auth": "./src/auth.mjs"
+  },
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "sgnl",
+    "actions",
+    "utilities",
+    "auth",
+    "oauth2"
+  ],
+  "author": "SGNL Engineering",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sgnl-actions/utils.git"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
