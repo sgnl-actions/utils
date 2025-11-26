@@ -139,10 +139,10 @@ describe('Auth Utilities', () => {
   });
 
   describe('getAuthorizationHeader', () => {
-    test('should return Bearer token from BEARER_TOKEN secret', async () => {
+    test('should return Bearer token from BEARER_AUTH_TOKEN secret', async () => {
       const context = {
         environment: {},
-        secrets: { BEARER_TOKEN: 'my-bearer-token' }
+        secrets: { BEARER_AUTH_TOKEN: 'my-bearer-token' }
       };
 
       const header = await getAuthorizationHeader(context);
@@ -152,7 +152,7 @@ describe('Auth Utilities', () => {
     test('should not double-prefix Bearer token', async () => {
       const context = {
         environment: {},
-        secrets: { BEARER_TOKEN: 'Bearer already-prefixed' }
+        secrets: { BEARER_AUTH_TOKEN: 'Bearer already-prefixed' }
       };
 
       const header = await getAuthorizationHeader(context);
@@ -161,8 +161,11 @@ describe('Auth Utilities', () => {
 
     test('should return Basic auth from username and password', async () => {
       const context = {
-        environment: { BASIC_USERNAME: 'myuser' },
-        secrets: { BASIC_PASSWORD: 'mypassword' }
+        environment: {},
+        secrets: {
+          BASIC_USERNAME: 'myuser',
+          BASIC_PASSWORD: 'mypassword'
+        }
       };
 
       const header = await getAuthorizationHeader(context);
@@ -289,7 +292,7 @@ describe('Auth Utilities', () => {
     test('should return headers object with Bearer auth', async () => {
       const context = {
         environment: {},
-        secrets: { BEARER_TOKEN: 'test-token' }
+        secrets: { BEARER_AUTH_TOKEN: 'test-token' }
       };
 
       const headers = await createAuthHeaders(context);
@@ -303,8 +306,11 @@ describe('Auth Utilities', () => {
 
     test('should return headers object with Basic auth', async () => {
       const context = {
-        environment: { BASIC_USERNAME: 'user' },
-        secrets: { BASIC_PASSWORD: 'pass' }
+        environment: {},
+        secrets: {
+          BASIC_USERNAME: 'user',
+          BASIC_PASSWORD: 'pass'
+        }
       };
 
       const headers = await createAuthHeaders(context);
