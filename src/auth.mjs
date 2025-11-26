@@ -89,14 +89,14 @@ export async function getAuthorizationHeader(context) {
   const secrets = context.secrets || {};
 
   // Method 1: Simple Bearer Token
-  if (secrets.BEARER_TOKEN) {
-    const token = secrets.BEARER_TOKEN;
+  if (secrets.BEARER_AUTH_TOKEN) {
+    const token = secrets.BEARER_AUTH_TOKEN;
     return token.startsWith('Bearer ') ? token : `Bearer ${token}`;
   }
 
   // Method 2: Basic Auth (username + password)
-  if (secrets.BASIC_PASSWORD && env.BASIC_USERNAME) {
-    const credentials = Buffer.from(`${env.BASIC_USERNAME}:${secrets.BASIC_PASSWORD}`).toString('base64');
+  if (secrets.BASIC_PASSWORD && secrets.BASIC_USERNAME) {
+    const credentials = Buffer.from(`${secrets.BASIC_USERNAME}:${secrets.BASIC_PASSWORD}`).toString('base64');
     return `Basic ${credentials}`;
   }
 
@@ -130,7 +130,7 @@ export async function getAuthorizationHeader(context) {
 
   throw new Error(
     'No authentication configured. Provide one of: ' +
-    'BEARER_TOKEN, BASIC_USERNAME/BASIC_PASSWORD, ' +
+    'BEARER_AUTH_TOKEN, BASIC_USERNAME/BASIC_PASSWORD, ' +
     'OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN, or OAUTH2_CLIENT_CREDENTIALS_*'
   );
 }
