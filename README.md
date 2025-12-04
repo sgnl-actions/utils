@@ -7,22 +7,26 @@ Shared utilities for SGNL actions.
 ```bash
 npm install github:sgnl-actions/utils
 # or with a specific tag/branch
-npm install github:sgnl-actions/utils#v1.0.0
+npm install github:sgnl-actions/utils#v1.1.0
 npm install github:sgnl-actions/utils#main
 ```
 
 ## Usage
 
 ```javascript
-import { getBaseUrl, createAuthHeaders } from '@sgnl-actions/utils';
+import { getBaseUrl, createAuthHeaders, resolveJsonPathTemplates } from '@sgnl-actions/utils';
 
 export default {
   invoke: async (params, context) => {
+    // Resolve JSONPath templates in params using job context from context.data
+    const jobContext = context.data || {};
+    const { result: resolvedParams } = resolveJsonPathTemplates(params, jobContext);
+
     // Get base URL and auth headers (auto-detects auth method)
-    const baseUrl = getBaseUrl(params, context);
+    const baseUrl = getBaseUrl(resolvedParams, context);
     const headers = await createAuthHeaders(context);
 
-    // Make API call
+    // Make API call with resolved values
     const response = await fetch(`${baseUrl}/v1.0/users`, { headers });
     // ...
   }
@@ -82,6 +86,50 @@ const token = await getClientCredentialsToken({
 | 2 | Basic Auth | - | `BASIC_USERNAME`, `BASIC_PASSWORD` |
 | 3 | OAuth2 Authorization Code | - | `OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN` |
 | 4 | OAuth2 Client Credentials | `OAUTH2_CLIENT_CREDENTIALS_TOKEN_URL`, `OAUTH2_CLIENT_CREDENTIALS_CLIENT_ID`, `OAUTH2_CLIENT_CREDENTIALS_SCOPE`, `OAUTH2_CLIENT_CREDENTIALS_AUDIENCE`, `OAUTH2_CLIENT_CREDENTIALS_AUTH_STYLE` | `OAUTH2_CLIENT_CREDENTIALS_CLIENT_SECRET` |
+
+## Template Resolution
+
+### `resolveJsonPathTemplates(input, jobContext, options)`
+
+Resolves JSONPath templates in input objects/strings using job context from `context.data`.
+
+```javascript
+import { resolveJsonPathTemplates } from '@sgnl-actions/utils';
+
+// Basic usage
+const jobContext = { user: { email: 'john@example.com', id: '123' } };
+const input = {
+  login: '{$.user.email}',
+  userId: '{$.user.id}',
+  timestamp: '{$.sgnl.time.now}',
+  requestId: '{$.sgnl.random.uuid}'
+};
+
+const { result, errors } = resolveJsonPathTemplates(input, jobContext);
+// result = {
+//   login: 'john@example.com',
+//   userId: '123',
+//   timestamp: '2025-12-04T10:30:00Z',
+//   requestId: '550e8400-e29b-41d4-a716-446655440000'
+// }
+```
+
+#### Template Syntax
+
+| Template | Description | Example |
+|----------|-------------|---------|
+| `{$.path.to.value}` | Extract value from job context | `{$.user.email}` → `john@example.com` |
+| `{$.array[0]}` | Access array element | `{$.items[0].id}` → `123` |
+| `{$.array[*].field}` | Wildcard array access | `{$.items[*].name}` → `["item1","item2"]` |
+| `{$.sgnl.time.now}` | Current RFC3339 timestamp | `2025-12-04T10:30:00Z` |
+| `{$.sgnl.random.uuid}` | Random UUID | `550e8400-e29b-...` |
+
+#### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `omitNoValueForExactTemplates` | boolean | `false` | If true, omits keys where the value is an exact template that can't be resolved (e.g., `{$.missing}`) |
+| `injectSgnlNamespace` | boolean | `true` | If true, injects `sgnl.time.now` and `sgnl.random.uuid` |
 
 ## License
 
