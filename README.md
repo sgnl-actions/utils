@@ -116,6 +116,8 @@ const { result, errors } = resolveJSONPathTemplates(input, jobContext);
 
 #### Template Syntax
 
+Templates use [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) expressions wrapped in curly braces.
+
 | Template | Description | Example |
 |----------|-------------|---------|
 | `{$.path.to.value}` | Extract value from job context | `{$.user.email}` → `john@example.com` |
