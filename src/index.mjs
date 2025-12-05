@@ -8,10 +8,10 @@
 export {
   getClientCredentialsToken,
   getAuthorizationHeader,
-  getBaseUrl,
+  getBaseURL,
   createAuthHeaders
 } from './auth.mjs';
 
 export {
-  resolveJsonPathTemplates,
+  resolveJSONPathTemplates,
 } from './template.mjs';

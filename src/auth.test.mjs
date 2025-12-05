@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 import {
   getClientCredentialsToken,
   getAuthorizationHeader,
-  getBaseUrl,
+  getBaseURL,
   createAuthHeaders
 } from './auth.mjs';
 
@@ -239,12 +239,12 @@ describe('Auth Utilities', () => {
     });
   });
 
-  describe('getBaseUrl', () => {
+  describe('getBaseURL', () => {
     test('should return address from params', () => {
       const params = { address: 'https://api.example.com' };
       const context = { environment: { ADDRESS: 'https://fallback.example.com' } };
 
-      const url = getBaseUrl(params, context);
+      const url = getBaseURL(params, context);
       expect(url).toBe('https://api.example.com');
     });
 
@@ -252,7 +252,7 @@ describe('Auth Utilities', () => {
       const params = {};
       const context = { environment: { ADDRESS: 'https://env.example.com' } };
 
-      const url = getBaseUrl(params, context);
+      const url = getBaseURL(params, context);
       expect(url).toBe('https://env.example.com');
     });
 
@@ -260,7 +260,7 @@ describe('Auth Utilities', () => {
       const params = { address: 'https://api.example.com/' };
       const context = { environment: {} };
 
-      const url = getBaseUrl(params, context);
+      const url = getBaseURL(params, context);
       expect(url).toBe('https://api.example.com');
     });
 
@@ -268,14 +268,14 @@ describe('Auth Utilities', () => {
       const params = {};
       const context = { environment: {} };
 
-      expect(() => getBaseUrl(params, context))
+      expect(() => getBaseURL(params, context))
         .toThrow('No URL specified. Provide address parameter or ADDRESS environment variable');
     });
 
     test('should handle null params', () => {
       const context = { environment: { ADDRESS: 'https://env.example.com' } };
 
-      const url = getBaseUrl(null, context);
+      const url = getBaseURL(null, context);
       expect(url).toBe('https://env.example.com');
     });
 
@@ -283,7 +283,7 @@ describe('Auth Utilities', () => {
       const params = { address: 'https://api.example.com' };
       const context = {};
 
-      const url = getBaseUrl(params, context);
+      const url = getBaseURL(params, context);
       expect(url).toBe('https://api.example.com');
     });
   });

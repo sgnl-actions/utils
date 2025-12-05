@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import {
-  resolveJsonPathTemplates
+  resolveJSONPathTemplates
 } from './template.mjs';
 
 // Mock crypto.randomUUID for deterministic tests
@@ -10,13 +10,13 @@ jest.unstable_mockModule('crypto', () => ({
 }));
 
 describe('Template Utilities', () => {
-  describe('resolveJsonPathTemplates', () => {
+  describe('resolveJSONPathTemplates', () => {
     describe('basic template resolution', () => {
       test('should resolve single template string with json path syntax', () => {
         const input = 'Hello {$.name}';
         const jobContext = { name: 'world' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello world');
         expect(errors).toHaveLength(0);
@@ -26,7 +26,7 @@ describe('Template Utilities', () => {
         const input = 'Hello {$.name.first}';
         const jobContext = { name: { first: 'world' } };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello world');
         expect(errors).toHaveLength(0);
@@ -36,7 +36,7 @@ describe('Template Utilities', () => {
         const input = '{$.greeting} {$.name}';
         const jobContext = { greeting: 'Hello', name: 'world' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello world');
         expect(errors).toHaveLength(0);
@@ -46,7 +46,7 @@ describe('Template Utilities', () => {
         const input = '{$.greeting} {$.name}-{$.name}';
         const jobContext = { greeting: 'Hello', name: 'world' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello world-world');
         expect(errors).toHaveLength(0);
@@ -56,7 +56,7 @@ describe('Template Utilities', () => {
         const input = 'Hello world';
         const jobContext = { greeting: 'Hello', name: 'world' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello world');
         expect(errors).toHaveLength(0);
@@ -66,7 +66,7 @@ describe('Template Utilities', () => {
         const input = 'Hello {$.name}';
         const jobContext = { greeting: 'Hello', name: 10 };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello 10');
         expect(errors).toHaveLength(0);
@@ -76,7 +76,7 @@ describe('Template Utilities', () => {
         const input = '{"text": "User access revoked (id: {$.user.id})"}';
         const jobContext = { user: { id: 1 } };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('{"text": "User access revoked (id: 1)"}');
         expect(errors).toHaveLength(0);
@@ -86,7 +86,7 @@ describe('Template Utilities', () => {
         const input = '{{{{{$.greeting} world}}}}';
         const jobContext = { greeting: 'Hello' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('{{{{Hello world}}}}');
         expect(errors).toHaveLength(0);
@@ -96,7 +96,7 @@ describe('Template Utilities', () => {
         const input = 'Hello {name}';
         const jobContext = { name: 'world' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello {name}');
         expect(errors).toHaveLength(0);
@@ -108,7 +108,7 @@ describe('Template Utilities', () => {
         const input = 'Hello {$.name} {$.name2}';
         const jobContext = { greeting: 'Hello' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello {No Value} {No Value}');
         expect(errors).toHaveLength(2);
@@ -120,7 +120,7 @@ describe('Template Utilities', () => {
         const input = 'Hello {$.name}';
         const jobContext = { greeting: 'Hello', name: '' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Hello ');
         expect(errors).toHaveLength(1);
@@ -133,9 +133,9 @@ describe('Template Utilities', () => {
         const input = 'Hello {$.name}';
         const jobContext = { greeting: 'Hello' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, {
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, {
           omitNoValueForExactTemplates: true,
-          injectSgnlNamespace: false
+          injectSGNLNamespace: false
         });
 
         expect(result).toBe('Hello {No Value}');
@@ -146,9 +146,9 @@ describe('Template Utilities', () => {
         const input = '{$.name}';
         const jobContext = { greeting: 'Hello' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, {
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, {
           omitNoValueForExactTemplates: true,
-          injectSgnlNamespace: false
+          injectSGNLNamespace: false
         });
 
         expect(result).toBe('');
@@ -164,9 +164,9 @@ describe('Template Utilities', () => {
         };
         const jobContext = { a: '1' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, {
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, {
           omitNoValueForExactTemplates: true,
-          injectSgnlNamespace: false
+          injectSGNLNamespace: false
         });
 
         expect(result).toEqual({
@@ -188,7 +188,7 @@ describe('Template Utilities', () => {
         };
         const jobContext = { a: '1', b: { c: '3' } };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toEqual({
           string_no_template: 'Test no template',
@@ -208,7 +208,7 @@ describe('Template Utilities', () => {
         };
         const jobContext = { a: '1', b: { c: '3' } };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toEqual({
           missing_template_1: 'Test replace template {No Value}',
@@ -224,7 +224,7 @@ describe('Template Utilities', () => {
         const input = 'Enabled: {$.enabled}';
         const jobContext = { enabled: true };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Enabled: true');
       });
@@ -233,7 +233,7 @@ describe('Template Utilities', () => {
         const input = 'Enabled: {$.enabled}';
         const jobContext = { enabled: false };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Enabled: false');
       });
@@ -242,7 +242,7 @@ describe('Template Utilities', () => {
         const input = 'Rate: {$.rate}';
         const jobContext = { rate: 16.44 };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Rate: 16.44');
       });
@@ -251,7 +251,7 @@ describe('Template Utilities', () => {
         const input = 'Count: {$.count}';
         const jobContext = { count: 0 };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Count: 0');
       });
@@ -260,7 +260,7 @@ describe('Template Utilities', () => {
         const input = 'Rate: {$.rate}';
         const jobContext = { rate: 0.0 };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Rate: 0');
       });
@@ -269,7 +269,7 @@ describe('Template Utilities', () => {
         const input = 'Items: {$.items}';
         const jobContext = { items: [1, 2, 3] };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Items: [1,2,3]');
       });
@@ -278,7 +278,7 @@ describe('Template Utilities', () => {
         const input = 'First: {$.items[0]}';
         const jobContext = { items: [1, 2, 3] };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('First: 1');
       });
@@ -293,7 +293,7 @@ describe('Template Utilities', () => {
           ]
         };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Third ID: 3');
       });
@@ -310,7 +310,7 @@ describe('Template Utilities', () => {
           }
         };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Theme: dark');
       });
@@ -327,7 +327,7 @@ describe('Template Utilities', () => {
           ]
         };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Names: ["item1","item2","item3"]');
       });
@@ -338,7 +338,7 @@ describe('Template Utilities', () => {
           items: [{ name: 'only' }]
         };
 
-        const { result } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Names: ["only"]');
       });
@@ -347,7 +347,7 @@ describe('Template Utilities', () => {
         const input = 'Names: {$.items[*].name}';
         const jobContext = { items: [] };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         // JSONPath returns no results for empty array wildcard - this is expected behavior
         expect(result).toBe('Names: {No Value}');
@@ -360,7 +360,7 @@ describe('Template Utilities', () => {
         const input = { timestamp: '{$.sgnl.time.now}' };
         const jobContext = {};
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext);
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext);
 
         // RFC3339 format without milliseconds: "2025-12-04T17:30:00Z"
         // This matches Go's time.RFC3339 format
@@ -372,7 +372,7 @@ describe('Template Utilities', () => {
         const input = { requestId: '{$.sgnl.random.uuid}' };
         const jobContext = {};
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext);
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext);
 
         // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         expect(result.requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
@@ -383,7 +383,7 @@ describe('Template Utilities', () => {
         const input = { timestamp: '{$.sgnl.time.now}' };
         const jobContext = {};
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result.timestamp).toBe('{No Value}');
         expect(errors).toHaveLength(1);
@@ -397,7 +397,7 @@ describe('Template Utilities', () => {
           }
         };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext);
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext);
 
         expect(result.custom).toBe('my-custom-value');
         expect(errors).toHaveLength(0);
@@ -408,7 +408,7 @@ describe('Template Utilities', () => {
       test('should handle null jobContext', () => {
         const input = { name: '{$.user.name}' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, null);
+        const { result, errors } = resolveJSONPathTemplates(input, null);
 
         expect(result.name).toBe('{No Value}');
         expect(errors).toHaveLength(1);
@@ -417,7 +417,7 @@ describe('Template Utilities', () => {
       test('should handle undefined jobContext', () => {
         const input = { name: '{$.user.name}' };
 
-        const { result, errors } = resolveJsonPathTemplates(input, undefined);
+        const { result, errors } = resolveJSONPathTemplates(input, undefined);
 
         expect(result.name).toBe('{No Value}');
         expect(errors).toHaveLength(1);
@@ -427,7 +427,7 @@ describe('Template Utilities', () => {
         const input = 'Value: {$.value}';
         const jobContext = { value: null };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toBe('Value: {No Value}');
         expect(errors).toHaveLength(1);
@@ -447,7 +447,7 @@ describe('Template Utilities', () => {
           user2: { name: 'Bob' }
         };
 
-        const { result, errors } = resolveJsonPathTemplates(input, jobContext, { injectSgnlNamespace: false });
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
         expect(result).toEqual({
           users: [

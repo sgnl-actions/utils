@@ -40,7 +40,7 @@ function formatRFC3339(date) {
  * @param {Object} jobContext - The job context object
  * @returns {Object} Job context with sgnl namespace injected
  */
-function injectSgnlNamespace(jobContext) {
+function injectSGNLNamespace(jobContext) {
   const now = new Date();
 
   return {
@@ -66,7 +66,7 @@ function injectSgnlNamespace(jobContext) {
  * @param {string} jsonPath - The JSONPath expression (e.g., "$.user.email")
  * @returns {{ value: any, found: boolean }} The extracted value and whether it was found
  */
-function extractJsonPathValue(json, jsonPath) {
+function extractJSONPathValue(json, jsonPath) {
   try {
     // JSONPath-plus expects paths starting with $
     const normalizedPath = jsonPath.startsWith('$') ? jsonPath : `$.${jsonPath}`;
@@ -123,7 +123,7 @@ function resolveTemplateString(templateString, jobContext, options = {}) {
   const isExactTemplate = EXACT_TEMPLATE_PATTERN.test(templateString);
 
   const result = templateString.replace(TEMPLATE_PATTERN, (_, jsonPath) => {
-    const { value, found } = extractJsonPathValue(jobContext, jsonPath);
+    const { value, found } = extractJSONPathValue(jobContext, jsonPath);
 
     if (!found) {
       errors.push(`failed to extract field '${jsonPath}': field not found`);
@@ -161,32 +161,32 @@ function resolveTemplateString(templateString, jobContext, options = {}) {
  * @param {Object} jobContext - The job context (from context.data) to resolve templates from
  * @param {Object} [options] - Resolution options
  * @param {boolean} [options.omitNoValueForExactTemplates=false] - If true, removes keys where exact templates can't be resolved
- * @param {boolean} [options.injectSgnlNamespace=true] - If true, injects sgnl.time.now and sgnl.random.uuid
+ * @param {boolean} [options.injectSGNLNamespace=true] - If true, injects sgnl.time.now and sgnl.random.uuid
  * @returns {{ result: Object|string, errors: string[] }} The resolved input and any errors encountered
  *
  * @example
  * // Basic usage
  * const jobContext = { user: { email: 'john@example.com' } };
  * const input = { login: '{$.user.email}' };
- * const { result } = resolveJsonPathTemplates(input, jobContext);
+ * const { result } = resolveJSONPathTemplates(input, jobContext);
  * // result = { login: 'john@example.com' }
  *
  * @example
  * // With runtime values
- * const { result } = resolveJsonPathTemplates(
+ * const { result } = resolveJSONPathTemplates(
  *   { timestamp: '{$.sgnl.time.now}', requestId: '{$.sgnl.random.uuid}' },
  *   {}
  * );
  * // result = { timestamp: '2025-12-04T10:30:00Z', requestId: '550e8400-...' }
  */
-export function resolveJsonPathTemplates(input, jobContext, options = {}) {
+export function resolveJSONPathTemplates(input, jobContext, options = {}) {
   const {
     omitNoValueForExactTemplates = false,
-    injectSgnlNamespace: shouldInjectSgnl = true
+    injectSGNLNamespace: shouldInjectSgnl = true
   } = options;
 
   // Inject SGNL namespace if enabled
-  const resolvedJobContext = shouldInjectSgnl ? injectSgnlNamespace(jobContext || {}) : (jobContext || {});
+  const resolvedJobContext = shouldInjectSgnl ? injectSGNLNamespace(jobContext || {}) : (jobContext || {});
 
   const allErrors = [];
 

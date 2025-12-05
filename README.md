@@ -14,16 +14,16 @@ npm install github:sgnl-actions/utils#main
 ## Usage
 
 ```javascript
-import { getBaseUrl, createAuthHeaders, resolveJsonPathTemplates } from '@sgnl-actions/utils';
+import { getBaseURL, createAuthHeaders, resolveJSONPathTemplates } from '@sgnl-actions/utils';
 
 export default {
   invoke: async (params, context) => {
     // Resolve JSONPath templates in params using job context from context.data
     const jobContext = context.data || {};
-    const { result: resolvedParams } = resolveJsonPathTemplates(params, jobContext);
+    const { result: resolvedParams } = resolveJSONPathTemplates(params, jobContext);
 
     // Get base URL and auth headers (auto-detects auth method)
-    const baseUrl = getBaseUrl(resolvedParams, context);
+    const baseUrl = getBaseURL(resolvedParams, context);
     const headers = await createAuthHeaders(context);
 
     // Make API call with resolved values
@@ -54,12 +54,12 @@ const authHeader = await getAuthorizationHeader(context);
 // Returns: 'Bearer xxx' or 'Basic xxx'
 ```
 
-### `getBaseUrl(params, context)`
+### `getBaseURL(params, context)`
 
 Gets the base URL for API calls:
 
 ```javascript
-const baseUrl = getBaseUrl(params, context);
+const baseUrl = getBaseURL(params, context);
 // Checks: params.address → context.env.ADDRESS
 ```
 
@@ -89,12 +89,12 @@ const token = await getClientCredentialsToken({
 
 ## Template Resolution
 
-### `resolveJsonPathTemplates(input, jobContext, options)`
+### `resolveJSONPathTemplates(input, jobContext, options)`
 
 Resolves JSONPath templates in input objects/strings using job context from `context.data`.
 
 ```javascript
-import { resolveJsonPathTemplates } from '@sgnl-actions/utils';
+import { resolveJSONPathTemplates } from '@sgnl-actions/utils';
 
 // Basic usage
 const jobContext = { user: { email: 'john@example.com', id: '123' } };
@@ -105,7 +105,7 @@ const input = {
   requestId: '{$.sgnl.random.uuid}'
 };
 
-const { result, errors } = resolveJsonPathTemplates(input, jobContext);
+const { result, errors } = resolveJSONPathTemplates(input, jobContext);
 // result = {
 //   login: 'john@example.com',
 //   userId: '123',
@@ -129,7 +129,7 @@ const { result, errors } = resolveJsonPathTemplates(input, jobContext);
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `omitNoValueForExactTemplates` | boolean | `false` | If true, omits keys where the value is an exact template that can't be resolved (e.g., `{$.missing}`) |
-| `injectSgnlNamespace` | boolean | `true` | If true, injects `sgnl.time.now` and `sgnl.random.uuid` |
+| `injectSGNLNamespace` | boolean | `true` | If true, injects `sgnl.time.now` and `sgnl.random.uuid` |
 
 ## License
 
