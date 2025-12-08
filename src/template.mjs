@@ -203,7 +203,7 @@ export function resolveJSONPathTemplates(input, jobContext, options = {}) {
     if (Array.isArray(value)) {
       const resolved = value.map(item => resolveValue(item));
       if (omitNoValueForExactTemplates) {
-        return resolved.filter(item => item !== '' && item !== NO_VALUE_PLACEHOLDER);
+        return resolved.filter(item => item !== '');
       }
       return resolved;
     }
