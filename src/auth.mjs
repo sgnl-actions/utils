@@ -142,7 +142,7 @@ export async function getAuthorizationHeader(context) {
  * @param {Object} context - Execution context
  * @returns {string} Base URL
  */
-export function getBaseUrl(params, context) {
+export function getBaseURL(params, context) {
   const env = context.environment || {};
   const address = params?.address || env.ADDRESS;
 

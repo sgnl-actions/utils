@@ -2,12 +2,16 @@
  * SGNL Actions Utilities
  *
  * Shared utilities for SGNL actions including authentication,
- * error handling, and common helpers.
+ * template resolution, and common helpers.
  */
 
 export {
   getClientCredentialsToken,
   getAuthorizationHeader,
-  getBaseUrl,
+  getBaseURL,
   createAuthHeaders
 } from './auth.mjs';
+
+export {
+  resolveJSONPathTemplates,
+} from './template.mjs';
