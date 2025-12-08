@@ -214,7 +214,7 @@ export function resolveJSONPathTemplates(input, jobContext, options = {}) {
         const resolvedVal = resolveValue(val);
 
         // If omitNoValueForExactTemplates is enabled, skip keys with empty exact template values
-        if (omitNoValueForExactTemplates && (resolvedVal === '' || resolvedVal === NO_VALUE_PLACEHOLDER)) {
+        if (omitNoValueForExactTemplates && resolvedVal === '') {
           continue;
         }
 
