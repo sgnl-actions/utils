@@ -175,6 +175,21 @@ describe('Template Utilities', () => {
         });
         expect(errors).toHaveLength(2);
       });
+
+      test('should filter array items that are exact templates with missing values', () => {
+        const input = {
+          items: ['{$.missing}', 'static', '{$.valid}']
+        };
+        const jobContext = { valid: 'value' };
+
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext, {
+          omitNoValueForExactTemplates: true,
+          injectSGNLNamespace: false
+        });
+
+        expect(result.items).toEqual(['static', 'value']);
+        expect(errors).toHaveLength(1);
+      });
     });
 
     describe('object and map resolution', () => {
