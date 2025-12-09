@@ -3,12 +3,6 @@ import {
   resolveJSONPathTemplates
 } from './template.mjs';
 
-// Mock crypto.randomUUID for deterministic tests
-const mockUUID = '550e8400-e29b-41d4-a716-446655440000';
-jest.unstable_mockModule('crypto', () => ({
-  randomUUID: jest.fn(() => mockUUID)
-}));
-
 describe('Template Utilities', () => {
   describe('resolveJSONPathTemplates', () => {
     describe('basic template resolution', () => {
@@ -380,17 +374,6 @@ describe('Template Utilities', () => {
         // RFC3339 format without milliseconds: "2025-12-04T17:30:00Z"
         // This matches Go's time.RFC3339 format
         expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
-        expect(errors).toHaveLength(0);
-      });
-
-      test('should inject sgnl.random.uuid', () => {
-        const input = { requestId: '{$.sgnl.random.uuid}' };
-        const jobContext = {};
-
-        const { result, errors } = resolveJSONPathTemplates(input, jobContext);
-
-        // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        expect(result.requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
         expect(errors).toHaveLength(0);
       });
 

@@ -5,7 +5,6 @@
  */
 
 import { JSONPath } from 'jsonpath-plus';
-import { randomUUID } from 'crypto';
 
 /**
  * Regex pattern to match JSONPath templates: {$.path.to.value}
@@ -50,10 +49,6 @@ function injectSGNLNamespace(jobContext) {
       time: {
         now: formatRFC3339(now),
         ...jobContext?.sgnl?.time
-      },
-      random: {
-        uuid: randomUUID(),
-        ...jobContext?.sgnl?.random
       }
     }
   };
