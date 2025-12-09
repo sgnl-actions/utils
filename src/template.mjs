@@ -4,8 +4,6 @@
  * Provides JSONPath-based template resolution for SGNL actions.
  */
 
-import { JSONPath } from 'jsonpath-plus';
-
 /**
  * Regex pattern to match JSONPath templates: {$.path.to.value}
  * Matches patterns starting with {$ and ending with }
@@ -55,7 +53,9 @@ function injectSGNLNamespace(jobContext) {
 }
 
 /**
- * Extracts a value from JSON using JSONPath.
+ * Extracts a value from JSON using a simple JSONPath implementation.
+ * Supports dot-notation paths like $.user.email and bracket notation like $.users[0].name
+ * Does not require external dependencies or vm module.
  *
  * @param {Object} json - The JSON object to extract from
  * @param {string} jsonPath - The JSONPath expression (e.g., "$.user.email")
@@ -63,22 +63,87 @@ function injectSGNLNamespace(jobContext) {
  */
 function extractJSONPathValue(json, jsonPath) {
   try {
-    // JSONPath-plus expects paths starting with $
-    const normalizedPath = jsonPath.startsWith('$') ? jsonPath : `$.${jsonPath}`;
+    // Remove leading $ and optional dot
+    let path = jsonPath;
+    if (path.startsWith('$.')) {
+      path = path.slice(2);
+    } else if (path.startsWith('$')) {
+      path = path.slice(1);
+    }
 
-    const results = JSONPath({
-      path: normalizedPath,
-      json: json,
-      wrap: false,  // Return single value instead of array for non-wildcard paths
-      eval: false   // Disable eval for security
-    });
+    // Handle empty path (just "$")
+    if (!path) {
+      return { value: json, found: true };
+    }
 
-    // Check if value was found
-    if (results === undefined || results === null) {
+    // Parse path into segments, handling both dot notation and bracket notation
+    // e.g., "user.addresses[0].city" -> ["user", "addresses", "0", "city"]
+    const segments = [];
+    let current = '';
+    let inBracket = false;
+
+    for (let i = 0; i < path.length; i++) {
+      const char = path[i];
+
+      if (char === '[' && !inBracket) {
+        if (current) {
+          segments.push(current);
+          current = '';
+        }
+        inBracket = true;
+      } else if (char === ']' && inBracket) {
+        if (current) {
+          // Remove quotes if present (for bracket notation like ['key'])
+          const cleaned = current.replace(/^['"]|['"]$/g, '');
+          segments.push(cleaned);
+          current = '';
+        }
+        inBracket = false;
+      } else if (char === '.' && !inBracket) {
+        if (current) {
+          segments.push(current);
+          current = '';
+        }
+      } else {
+        current += char;
+      }
+    }
+
+    if (current) {
+      segments.push(current);
+    }
+
+    // Traverse the object
+    let value = json;
+    for (const segment of segments) {
+      if (value === null || value === undefined) {
+        return { value: null, found: false };
+      }
+
+      if (typeof value !== 'object') {
+        return { value: null, found: false };
+      }
+
+      // Handle array index
+      if (Array.isArray(value) && /^\d+$/.test(segment)) {
+        const index = parseInt(segment, 10);
+        if (index < 0 || index >= value.length) {
+          return { value: null, found: false };
+        }
+        value = value[index];
+      } else if (Object.prototype.hasOwnProperty.call(value, segment)) {
+        value = value[segment];
+      } else {
+        return { value: null, found: false };
+      }
+    }
+
+    // Treat null as not found (consistent with original jsonpath-plus behavior)
+    if (value === null) {
       return { value: null, found: false };
     }
 
-    return { value: results, found: true };
+    return { value, found: true };
   } catch {
     return { value: null, found: false };
   }
@@ -151,13 +216,12 @@ function resolveTemplateString(templateString, jobContext, options = {}) {
  * Template syntax: {$.path.to.value}
  * - {$.user.email} - Extracts user.email from jobContext
  * - {$.sgnl.time.now} - Current RFC3339 timestamp (injected at runtime)
- * - {$.sgnl.random.uuid} - Random UUID (injected at runtime)
  *
  * @param {Object|string} input - The input containing templates to resolve
  * @param {Object} jobContext - The job context (from context.data) to resolve templates from
  * @param {Object} [options] - Resolution options
  * @param {boolean} [options.omitNoValueForExactTemplates=false] - If true, removes keys where exact templates can't be resolved
- * @param {boolean} [options.injectSGNLNamespace=true] - If true, injects sgnl.time.now and sgnl.random.uuid
+ * @param {boolean} [options.injectSGNLNamespace=true] - If true, injects sgnl.time.now
  * @returns {{ result: Object|string, errors: string[] }} The resolved input and any errors encountered
  *
  * @example
@@ -170,10 +234,10 @@ function resolveTemplateString(templateString, jobContext, options = {}) {
  * @example
  * // With runtime values
  * const { result } = resolveJSONPathTemplates(
- *   { timestamp: '{$.sgnl.time.now}', requestId: '{$.sgnl.random.uuid}' },
+ *   { timestamp: '{$.sgnl.time.now}' },
  *   {}
  * );
- * // result = { timestamp: '2025-12-04T10:30:00Z', requestId: '550e8400-...' }
+ * // result = { timestamp: '2025-12-04T10:30:00Z' }
  */
 export function resolveJSONPathTemplates(input, jobContext, options = {}) {
   const {

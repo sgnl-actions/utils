@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals';
 import {
   resolveJSONPathTemplates
 } from './template.mjs';
@@ -325,8 +324,12 @@ describe('Template Utilities', () => {
       });
     });
 
-    describe('wildcard support', () => {
-      test('should handle wildcard returning array', () => {
+    describe('unsupported advanced JSONPath features', () => {
+      // Note: The simple JSONPath implementation does not support wildcards, filters, or recursive descent.
+      // These features would require a full JSONPath library like jsonpath-plus which uses vm module.
+      // For sandbox compatibility, we use a simple implementation that supports dot notation and array indices.
+
+      test('should not resolve wildcard syntax (unsupported)', () => {
         const input = 'Names: {$.items[*].name}';
         const jobContext = {
           items: [
@@ -336,29 +339,9 @@ describe('Template Utilities', () => {
           ]
         };
 
-        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
-
-        expect(result).toBe('Names: ["item1","item2","item3"]');
-      });
-
-      test('should handle wildcard with single element', () => {
-        const input = 'Names: {$.items[*].name}';
-        const jobContext = {
-          items: [{ name: 'only' }]
-        };
-
-        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
-
-        expect(result).toBe('Names: ["only"]');
-      });
-
-      test('should handle wildcard with empty array', () => {
-        const input = 'Names: {$.items[*].name}';
-        const jobContext = { items: [] };
-
         const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
 
-        // JSONPath returns no results for empty array wildcard - this is expected behavior
+        // Wildcards are not supported - returns {No Value}
         expect(result).toBe('Names: {No Value}');
         expect(errors).toHaveLength(1);
       });
