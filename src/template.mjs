@@ -69,7 +69,8 @@ function extractJSONPathValue(json, jsonPath) {
     const results = JSONPath({
       path: normalizedPath,
       json: json,
-      wrap: false  // Return single value instead of array for non-wildcard paths
+      wrap: false,  // Return single value instead of array for non-wildcard paths
+      eval: false   // Disable eval for security
     });
 
     // Check if value was found
