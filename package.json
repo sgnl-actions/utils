@@ -32,8 +32,5 @@
   },
   "devDependencies": {
     "jest": "^30.2.0"
-  },
-  "dependencies": {
-    "jsonpath-plus": "^10.3.0"
   }
 }

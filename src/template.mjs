@@ -4,8 +4,38 @@
  * Provides JSONPath-based template resolution for SGNL actions.
  */
 
-import { JSONPath } from 'jsonpath-plus';
-import { randomUUID } from 'crypto';
+/**
+ * Simple path getter that traverses an object using dot/bracket notation.
+ * Does not use eval or Function constructor, safe for sandbox execution.
+ *
+ * Supports: dot notation (a.b.c), bracket notation (items[0]), nested paths (items[0].name)
+ *
+ * @param {Object} obj - The object to traverse
+ * @param {string} path - The path string (e.g., "user.name" or "items[0].id")
+ * @returns {any} The value at the path, or undefined if not found
+ */
+function get(obj, path) {
+  if (!path || obj == null) {
+    return undefined;
+  }
+
+  // Split path into segments, handling both dot and bracket notation
+  // "items[0].name" -> ["items", "0", "name"]
+  const segments = path
+    .replace(/\[(\d+)\]/g, '.$1')  // Convert [0] to .0
+    .split('.')
+    .filter(Boolean);
+
+  let current = obj;
+  for (const segment of segments) {
+    if (current == null) {
+      return undefined;
+    }
+    current = current[segment];
+  }
+
+  return current;
+}
 
 /**
  * Regex pattern to match JSONPath templates: {$.path.to.value}
@@ -52,7 +82,7 @@ function injectSGNLNamespace(jobContext) {
         ...jobContext?.sgnl?.time
       },
       random: {
-        uuid: randomUUID(),
+        uuid: crypto.randomUUID(),
         ...jobContext?.sgnl?.random
       }
     }
@@ -60,7 +90,13 @@ function injectSGNLNamespace(jobContext) {
 }
 
 /**
- * Extracts a value from JSON using JSONPath.
+ * Extracts a value from JSON using path traversal.
+ *
+ * Supported: dot notation (a.b.c), bracket notation (items[0]),
+ * nested paths (items[0].name), deep nesting (a.b.c.d.e).
+ *
+ * TODO: Advanced JSONPath features not supported: wildcard [*], filters [?()],
+ * recursive descent (..), slices [start:end], scripts [()].
  *
  * @param {Object} json - The JSON object to extract from
  * @param {string} jsonPath - The JSONPath expression (e.g., "$.user.email")
@@ -68,14 +104,20 @@ function injectSGNLNamespace(jobContext) {
  */
 function extractJSONPathValue(json, jsonPath) {
   try {
-    // JSONPath-plus expects paths starting with $
-    const normalizedPath = jsonPath.startsWith('$') ? jsonPath : `$.${jsonPath}`;
+    // Convert JSONPath to path by removing leading $. or $
+    let path = jsonPath;
+    if (path.startsWith('$.')) {
+      path = path.slice(2);
+    } else if (path.startsWith('$')) {
+      path = path.slice(1);
+    }
 
-    const results = JSONPath({
-      path: normalizedPath,
-      json: json,
-      wrap: false  // Return single value instead of array for non-wildcard paths
-    });
+    // Handle root reference ($)
+    if (!path) {
+      return { value: json, found: true };
+    }
+
+    const results = get(json, path);
 
     // Check if value was found
     if (results === undefined || results === null) {
