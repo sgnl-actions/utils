@@ -32,5 +32,8 @@
   },
   "devDependencies": {
     "jest": "^30.2.0"
+  },
+  "dependencies": {
+    "lodash.get": "^4.4.2"
   }
 }

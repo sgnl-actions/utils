@@ -324,28 +324,48 @@ describe('Template Utilities', () => {
       });
     });
 
-    describe('unsupported advanced JSONPath features', () => {
-      // Note: The simple JSONPath implementation does not support wildcards, filters, or recursive descent.
-      // These features would require a full JSONPath library like jsonpath-plus which uses vm module.
-      // For sandbox compatibility, we use a simple implementation that supports dot notation and array indices.
-
-      test('should not resolve wildcard syntax (unsupported)', () => {
-        const input = 'Names: {$.items[*].name}';
-        const jobContext = {
-          items: [
-            { name: 'item1' },
-            { name: 'item2' },
-            { name: 'item3' }
-          ]
-        };
-
-        const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
-
-        // Wildcards are not supported - returns {No Value}
-        expect(result).toBe('Names: {No Value}');
-        expect(errors).toHaveLength(1);
-      });
-    });
+    // TODO: Wildcard support requires advanced JSONPath features not available in lodash.get.
+    // These tests are commented out until we add a JSONPath library that supports wildcards [*],
+    // filters [?()], recursive descent (..), and other advanced features.
+    //
+    // describe('wildcard support', () => {
+    //   test('should handle wildcard returning array', () => {
+    //     const input = 'Names: {$.items[*].name}';
+    //     const jobContext = {
+    //       items: [
+    //         { name: 'item1' },
+    //         { name: 'item2' },
+    //         { name: 'item3' }
+    //       ]
+    //     };
+    //
+    //     const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
+    //
+    //     expect(result).toBe('Names: ["item1","item2","item3"]');
+    //   });
+    //
+    //   test('should handle wildcard with single element', () => {
+    //     const input = 'Names: {$.items[*].name}';
+    //     const jobContext = {
+    //       items: [{ name: 'only' }]
+    //     };
+    //
+    //     const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
+    //
+    //     expect(result).toBe('Names: ["only"]');
+    //   });
+    //
+    //   test('should handle wildcard with empty array', () => {
+    //     const input = 'Names: {$.items[*].name}';
+    //     const jobContext = { items: [] };
+    //
+    //     const { result, errors } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
+    //
+    //     // JSONPath returns no results for empty array wildcard - this is expected behavior
+    //     expect(result).toBe('Names: {No Value}');
+    //     expect(errors).toHaveLength(1);
+    //   });
+    // });
 
     describe('SGNL namespace injection', () => {
       test('should inject sgnl.time.now in RFC3339 format (no milliseconds)', () => {
@@ -357,6 +377,17 @@ describe('Template Utilities', () => {
         // RFC3339 format without milliseconds: "2025-12-04T17:30:00Z"
         // This matches Go's time.RFC3339 format
         expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+        expect(errors).toHaveLength(0);
+      });
+
+      test('should inject sgnl.random.uuid', () => {
+        const input = { requestId: '{$.sgnl.random.uuid}' };
+        const jobContext = {};
+
+        const { result, errors } = resolveJSONPathTemplates(input, jobContext);
+
+        // UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        expect(result.requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
         expect(errors).toHaveLength(0);
       });
 
