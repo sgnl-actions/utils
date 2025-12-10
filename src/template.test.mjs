@@ -322,6 +322,54 @@ describe('Template Utilities', () => {
 
         expect(result).toBe('Theme: dark');
       });
+
+      test('should handle bracket notation with string keys (single quotes)', () => {
+        const input = "Title: {$.store['book']['title']}";
+        const jobContext = {
+          store: {
+            book: {
+              title: 'The Great Gatsby'
+            }
+          }
+        };
+
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
+
+        expect(result).toBe('Title: The Great Gatsby');
+      });
+
+      test('should handle bracket notation with string keys (double quotes)', () => {
+        const input = 'Author: {$.store["book"]["author"]}';
+        const jobContext = {
+          store: {
+            book: {
+              author: 'F. Scott Fitzgerald'
+            }
+          }
+        };
+
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
+
+        expect(result).toBe('Author: F. Scott Fitzgerald');
+      });
+
+      test('should handle mixed bracket and dot notation', () => {
+        const input = "Value: {$.x['store'].book[0]['title']}";
+        const jobContext = {
+          x: {
+            store: {
+              book: [
+                { title: 'First Book' },
+                { title: 'Second Book' }
+              ]
+            }
+          }
+        };
+
+        const { result } = resolveJSONPathTemplates(input, jobContext, { injectSGNLNamespace: false });
+
+        expect(result).toBe('Value: First Book');
+      });
     });
 
     // TODO: Wildcard support requires advanced JSONPath features not yet implemented.

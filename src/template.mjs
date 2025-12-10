@@ -8,7 +8,8 @@
  * Simple path getter that traverses an object using dot/bracket notation.
  * Does not use eval or Function constructor, safe for sandbox execution.
  *
- * Supports: dot notation (a.b.c), bracket notation (items[0]), nested paths (items[0].name)
+ * Supports: dot notation (a.b.c), bracket notation with numbers (items[0]) or
+ * strings (items['key'] or items["key"]), nested paths (items[0].name)
  *
  * @param {Object} obj - The object to traverse
  * @param {string} path - The path string (e.g., "user.name" or "items[0].id")
@@ -21,8 +22,11 @@ function get(obj, path) {
 
   // Split path into segments, handling both dot and bracket notation
   // "items[0].name" -> ["items", "0", "name"]
+  // "x['store']['book']" -> ["x", "store", "book"]
   const segments = path
-    .replace(/\[(\d+)\]/g, '.$1')  // Convert [0] to .0
+    .replace(/\[(\d+)\]/g, '.$1')           // Convert [0] to .0
+    .replace(/\['([^']+)'\]/g, '.$1')       // Convert ['key'] to .key
+    .replace(/\["([^"]+)"\]/g, '.$1')       // Convert ["key"] to .key
     .split('.')
     .filter(Boolean);
 
