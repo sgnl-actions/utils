@@ -324,9 +324,9 @@ describe('Template Utilities', () => {
       });
     });
 
-    // TODO: Wildcard support requires advanced JSONPath features not available in lodash.get.
-    // These tests are commented out until we add a JSONPath library that supports wildcards [*],
-    // filters [?()], recursive descent (..), and other advanced features.
+    // TODO: Wildcard support requires advanced JSONPath features not yet implemented.
+    // These tests are commented out until we add support for wildcards [*], filters [?()],
+    // recursive descent (..), and other advanced features.
     //
     // describe('wildcard support', () => {
     //   test('should handle wildcard returning array', () => {
