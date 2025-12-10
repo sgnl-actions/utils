@@ -90,9 +90,9 @@ function injectSGNLNamespace(jobContext) {
 }
 
 /**
- * Extracts a value from JSON using lodash.get for path traversal.
+ * Extracts a value from JSON using path traversal.
  *
- * Supported by lodash.get: dot notation (a.b.c), bracket notation (items[0]),
+ * Supported: dot notation (a.b.c), bracket notation (items[0]),
  * nested paths (items[0].name), deep nesting (a.b.c.d.e).
  *
  * TODO: Advanced JSONPath features not supported: wildcard [*], filters [?()],
@@ -104,7 +104,7 @@ function injectSGNLNamespace(jobContext) {
  */
 function extractJSONPathValue(json, jsonPath) {
   try {
-    // Convert JSONPath to lodash.get path by removing leading $. or $
+    // Convert JSONPath to path by removing leading $. or $
     let path = jsonPath;
     if (path.startsWith('$.')) {
       path = path.slice(2);
