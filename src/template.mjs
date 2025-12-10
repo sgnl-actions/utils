@@ -4,7 +4,38 @@
  * Provides JSONPath-based template resolution for SGNL actions.
  */
 
-import get from 'lodash.get';
+/**
+ * Simple path getter that traverses an object using dot/bracket notation.
+ * Does not use eval or Function constructor, safe for sandbox execution.
+ *
+ * Supports: dot notation (a.b.c), bracket notation (items[0]), nested paths (items[0].name)
+ *
+ * @param {Object} obj - The object to traverse
+ * @param {string} path - The path string (e.g., "user.name" or "items[0].id")
+ * @returns {any} The value at the path, or undefined if not found
+ */
+function get(obj, path) {
+  if (!path || obj == null) {
+    return undefined;
+  }
+
+  // Split path into segments, handling both dot and bracket notation
+  // "items[0].name" -> ["items", "0", "name"]
+  const segments = path
+    .replace(/\[(\d+)\]/g, '.$1')  // Convert [0] to .0
+    .split('.')
+    .filter(Boolean);
+
+  let current = obj;
+  for (const segment of segments) {
+    if (current == null) {
+      return undefined;
+    }
+    current = current[segment];
+  }
+
+  return current;
+}
 
 /**
  * Regex pattern to match JSONPath templates: {$.path.to.value}
