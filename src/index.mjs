@@ -15,3 +15,7 @@ export {
 export {
   resolveJSONPathTemplates,
 } from './template.mjs';
+
+export {
+  signSET
+} from './set.mjs';

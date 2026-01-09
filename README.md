@@ -14,7 +14,7 @@ npm install github:sgnl-actions/utils#main
 ## Usage
 
 ```javascript
-import { getBaseURL, createAuthHeaders, resolveJSONPathTemplates } from '@sgnl-actions/utils';
+import { getBaseURL, createAuthHeaders, resolveJSONPathTemplates, signSET } from '@sgnl-actions/utils';
 
 export default {
   invoke: async (params, context) => {
@@ -86,6 +86,42 @@ const token = await getClientCredentialsToken({
 | 2 | Basic Auth | - | `BASIC_USERNAME`, `BASIC_PASSWORD` |
 | 3 | OAuth2 Authorization Code | - | `OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN` |
 | 4 | OAuth2 Client Credentials | `OAUTH2_CLIENT_CREDENTIALS_TOKEN_URL`, `OAUTH2_CLIENT_CREDENTIALS_CLIENT_ID`, `OAUTH2_CLIENT_CREDENTIALS_SCOPE`, `OAUTH2_CLIENT_CREDENTIALS_AUDIENCE`, `OAUTH2_CLIENT_CREDENTIALS_AUTH_STYLE` | `OAUTH2_CLIENT_CREDENTIALS_CLIENT_SECRET` |
+
+## Security Event Tokens (SET)
+
+### `signSET(context, eventPayload)`
+
+Signs a Security Event Token (SET) according to RFC 8417. The signing process automatically adds reserved claims (`iss`, `iat`, `jti`, `exp`, `nbf`) - these should not be included in your payload.
+
+```javascript
+import { signSET } from '@sgnl-actions/utils';
+
+const eventPayload = {
+  aud: 'https://receiver.example.com',
+  sub_id: {
+    format: 'email',
+    email: 'user@example.com'
+  },
+  events: {
+    'https://schemas.openid.net/secevent/caep/event-type/session-revoked': {
+      event_timestamp: Math.floor(Date.now() / 1000),
+      reason_admin: 'Security policy violation'
+    }
+  }
+};
+
+const jwt = await signSET(context, eventPayload);
+// Returns: Signed JWT string with typ: 'secevent+jwt'
+```
+
+**Important:** Do not include these reserved claims in your payload - they are set automatically during signing:
+- `iss` (issuer)
+- `iat` (issued at)
+- `jti` (JWT ID)
+- `exp` (expiration)
+- `nbf` (not before)
+
+If these claims are accidentally included, they will be filtered out and a warning will be logged.
 
 ## Template Resolution
 
