@@ -172,7 +172,7 @@ describe('Auth Utilities', () => {
 
       // Decode and verify
       const base64Part = header.replace('Basic ', '');
-      const decoded = Buffer.from(base64Part, 'base64').toString('utf-8');
+      const decoded = atob(base64Part);
       expect(decoded).toBe('myuser:mypassword');
     });
 
