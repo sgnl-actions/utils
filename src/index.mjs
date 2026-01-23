@@ -1,8 +1,8 @@
 /**
  * SGNL Actions Utilities
  *
- * Shared utilities for SGNL actions including authentication,
- * template resolution, and common helpers.
+ * Shared utilities for SGNL actions including authentication
+ * and common helpers.
  */
 
 export {
@@ -11,10 +11,6 @@ export {
   getBaseURL,
   createAuthHeaders
 } from './auth.mjs';
-
-export {
-  resolveJSONPathTemplates,
-} from './template.mjs';
 
 export {
   signSET
