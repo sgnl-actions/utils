@@ -14,19 +14,15 @@ npm install github:sgnl-actions/utils#main
 ## Usage
 
 ```javascript
-import { getBaseURL, createAuthHeaders, resolveJSONPathTemplates, signSET } from '@sgnl-actions/utils';
+import { getBaseURL, createAuthHeaders, signSET } from '@sgnl-actions/utils';
 
 export default {
   invoke: async (params, context) => {
-    // Resolve JSONPath templates in params using job context from context.data
-    const jobContext = context.data || {};
-    const { result: resolvedParams } = resolveJSONPathTemplates(params, jobContext);
-
     // Get base URL and auth headers (auto-detects auth method)
-    const baseUrl = getBaseURL(resolvedParams, context);
+    const baseUrl = getBaseURL(params, context);
     const headers = await createAuthHeaders(context);
 
-    // Make API call with resolved values
+    // Make API call
     const response = await fetch(`${baseUrl}/v1.0/users`, { headers });
     // ...
   }
@@ -122,52 +118,6 @@ const jwt = await signSET(context, eventPayload);
 - `nbf` (not before)
 
 If these claims are accidentally included, they will be filtered out and a warning will be logged.
-
-## Template Resolution
-
-### `resolveJSONPathTemplates(input, jobContext, options)`
-
-Resolves JSONPath templates in input objects/strings using job context from `context.data`.
-
-```javascript
-import { resolveJSONPathTemplates } from '@sgnl-actions/utils';
-
-// Basic usage
-const jobContext = { user: { email: 'john@example.com', id: '123' } };
-const input = {
-  login: '{$.user.email}',
-  userId: '{$.user.id}',
-  timestamp: '{$.sgnl.time.now}',
-  requestId: '{$.sgnl.random.uuid}'
-};
-
-const { result, errors } = resolveJSONPathTemplates(input, jobContext);
-// result = {
-//   login: 'john@example.com',
-//   userId: '123',
-//   timestamp: '2025-12-04T10:30:00Z',
-//   requestId: '550e8400-e29b-41d4-a716-446655440000'
-// }
-```
-
-#### Template Syntax
-
-Templates use [JSONPath](https://www.rfc-editor.org/rfc/rfc9535.html) expressions wrapped in curly braces.
-
-| Template | Description | Example |
-|----------|-------------|---------|
-| `{$.path.to.value}` | Extract value from job context | `{$.user.email}` → `john@example.com` |
-| `{$.array[0]}` | Access array element | `{$.items[0].id}` → `123` |
-| `{$.array[*].field}` | Wildcard array access | `{$.items[*].name}` → `["item1","item2"]` |
-| `{$.sgnl.time.now}` | Current RFC3339 timestamp | `2025-12-04T10:30:00Z` |
-| `{$.sgnl.random.uuid}` | Random UUID | `550e8400-e29b-...` |
-
-#### Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `omitNoValueForExactTemplates` | boolean | `false` | If true, omits keys where the value is an exact template that can't be resolved (e.g., `{$.missing}`) |
-| `injectSGNLNamespace` | boolean | `true` | If true, injects `sgnl.time.now` and `sgnl.random.uuid` |
 
 ## License
 
