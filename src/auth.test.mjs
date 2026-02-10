@@ -3,7 +3,8 @@ import {
   getClientCredentialsToken,
   getAuthorizationHeader,
   getBaseURL,
-  createAuthHeaders
+  createAuthHeaders,
+  SGNL_USER_AGENT 
 } from './auth.mjs';
 
 // Mock fetch globally
@@ -300,7 +301,8 @@ describe('Auth Utilities', () => {
       expect(headers).toEqual({
         'Authorization': 'Bearer test-token',
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        "User-Agent": SGNL_USER_AGENT
       });
     });
 
@@ -318,8 +320,8 @@ describe('Auth Utilities', () => {
       expect(headers.Authorization).toMatch(/^Basic /);
       expect(headers.Accept).toBe('application/json');
       expect(headers['Content-Type']).toBe('application/json');
+      expect(headers['User-Agent']).toBe(SGNL_USER_AGENT);
     });
-
     test('should throw error when no auth configured', async () => {
       const context = { environment: {}, secrets: {} };
 
