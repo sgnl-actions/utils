@@ -88,7 +88,7 @@ export async function getClientCredentialsToken(config) {
  * @param {Object} context - Execution context with environment and secrets
  * @param {Object} context.environment - Environment variables
  * @param {Object} context.secrets - Secret values
- * @returns {Promise<string>} Authorization header value (e.g., "Bearer xxx" or "Basic xxx")
+ * @returns {Promise<string>} Authorization header value (e.g., "Bearer xxx" or "Basic xxx"), or empty string if no auth configured
  */
 export async function getAuthorizationHeader(context) {
   const env = context.environment || {};
@@ -134,11 +134,9 @@ export async function getAuthorizationHeader(context) {
     return `Bearer ${token}`;
   }
 
-  throw new Error(
-    'No authentication configured. Provide one of: ' +
-    'BEARER_AUTH_TOKEN, BASIC_USERNAME/BASIC_PASSWORD, ' +
-    'OAUTH2_AUTHORIZATION_CODE_ACCESS_TOKEN, or OAUTH2_CLIENT_CREDENTIALS_*'
-  );
+  // No auth configured - return empty string (auth is optional).
+  // Requiring auth should be enforced in the specific action implementation if needed.
+  return '';
 }
 
 /**
@@ -161,16 +159,21 @@ export function getBaseURL(params, context) {
 }
 
 /**
- * Create full headers object with Authorization and common headers
+ * Create full headers object with common headers and Authorization (if configured)
  * @param {Object} context - Execution context with env and secrets
- * @returns {Promise<Object>} Headers object with Authorization, Accept, Content-Type
+ * @returns {Promise<Object>} Headers object with Accept, Content-Type, User-Agent, and Authorization (if auth is configured)
  */
-export async function createAuthHeaders(context) {
+export async function createHeaders(context) {
   const authHeader = await getAuthorizationHeader(context);
-  return {
-    'Authorization': authHeader,
+  const headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'User-Agent': SGNL_USER_AGENT
   };
+
+  if (authHeader) {
+    headers['Authorization'] = authHeader;
+  }
+
+  return headers;
 }

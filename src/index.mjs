@@ -9,7 +9,7 @@ export {
   getClientCredentialsToken,
   getAuthorizationHeader,
   getBaseURL,
-  createAuthHeaders,
+  createHeaders,
   SGNL_USER_AGENT
 } from './auth.mjs';
 
