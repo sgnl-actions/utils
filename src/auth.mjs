@@ -88,7 +88,7 @@ export async function getClientCredentialsToken(config) {
  * @param {Object} context - Execution context with environment and secrets
  * @param {Object} context.environment - Environment variables
  * @param {Object} context.secrets - Secret values
- * @returns {Promise<string|null>} Authorization header value (e.g., "Bearer xxx" or "Basic xxx"), or null if no auth configured
+ * @returns {Promise<string>} Authorization header value (e.g., "Bearer xxx" or "Basic xxx"), or empty string if no auth configured
  */
 export async function getAuthorizationHeader(context) {
   const env = context.environment || {};
@@ -134,8 +134,9 @@ export async function getAuthorizationHeader(context) {
     return `Bearer ${token}`;
   }
 
-  // No auth configured - return null (auth is optional)
-  return null;
+  // No auth configured - return empty string (auth is optional).
+  // Requiring auth should be enforced in the specific action implementation if needed.
+  return '';
 }
 
 /**

@@ -214,14 +214,14 @@ describe("Auth Utilities", () => {
       expect(global.fetch).toHaveBeenCalled();
     });
 
-    test("should return null when no auth configured", async () => {
+    test("should return empty string when no auth configured", async () => {
       const context = {
         environment: {},
         secrets: {},
       };
 
       const header = await getAuthorizationHeader(context);
-      expect(header).toBeNull();
+      expect(header).toBe("");
     });
 
     test("should throw error when OAuth2 Client Credentials missing TOKEN_URL", async () => {
@@ -243,7 +243,7 @@ describe("Auth Utilities", () => {
       const context = {};
 
       const header = await getAuthorizationHeader(context);
-      expect(header).toBeNull();
+      expect(header).toBe("");
     });
   });
 
