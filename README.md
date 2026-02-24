@@ -31,15 +31,18 @@ export default {
 
 ## API Reference
 
-### `createAuthHeaders(context)`
+### `createHeaders(context)`
 
-Creates full headers object with Authorization and common headers. Auto-detects auth method.
+Creates full headers object with common headers and Authorization (if configured). Auto-detects auth method.
 
 ```javascript
-const headers = await createAuthHeaders(context);
-// Returns: { Authorization: 'Bearer xxx', Accept: 'application/json', 'Content-Type': 'application/json' }
+const headers = await createHeaders(context);
+// Returns: { Authorization: 'Bearer xxx', Accept: 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'SGNL-CAEP-Hub/2.0' }
 // Or for Basic: { Authorization: 'Basic xxx', ... }
+// Or no auth: { Accept: 'application/json', 'Content-Type': 'application/json', 'User-Agent': 'SGNL-CAEP-Hub/2.0' }
 ```
+
+**Note:** `createAuthHeaders` is deprecated but still available as an alias for backward compatibility.
 
 ### `getAuthorizationHeader(context)`
 
@@ -47,7 +50,7 @@ Returns just the Authorization header value. Auto-detects auth method.
 
 ```javascript
 const authHeader = await getAuthorizationHeader(context);
-// Returns: 'Bearer xxx' or 'Basic xxx'
+// Returns: 'Bearer xxx' or 'Basic xxx' or '' (empty string if no auth configured)
 ```
 
 ### `getBaseURL(params, context)`

@@ -159,11 +159,11 @@ export function getBaseURL(params, context) {
 }
 
 /**
- * Create full headers object with Authorization and common headers
+ * Create full headers object with common headers and Authorization (if configured)
  * @param {Object} context - Execution context with env and secrets
- * @returns {Promise<Object>} Headers object with Authorization (if configured), Accept, Content-Type
+ * @returns {Promise<Object>} Headers object with Accept, Content-Type, User-Agent, and Authorization (if auth is configured)
  */
-export async function createAuthHeaders(context) {
+export async function createHeaders(context) {
   const authHeader = await getAuthorizationHeader(context);
   const headers = {
     'Accept': 'application/json',
@@ -171,7 +171,6 @@ export async function createAuthHeaders(context) {
     'User-Agent': SGNL_USER_AGENT
   };
 
-  // Only add Authorization header if auth is configured
   if (authHeader) {
     headers['Authorization'] = authHeader;
   }

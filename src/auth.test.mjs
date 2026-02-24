@@ -3,7 +3,7 @@ import {
   getClientCredentialsToken,
   getAuthorizationHeader,
   getBaseURL,
-  createAuthHeaders,
+  createHeaders,
   SGNL_USER_AGENT,
 } from "./auth.mjs";
 
@@ -297,14 +297,14 @@ describe("Auth Utilities", () => {
     });
   });
 
-  describe("createAuthHeaders", () => {
+  describe("createHeaders", () => {
     test("should return headers object with Bearer auth", async () => {
       const context = {
         environment: {},
         secrets: { BEARER_AUTH_TOKEN: "test-token" },
       };
 
-      const headers = await createAuthHeaders(context);
+      const headers = await createHeaders(context);
 
       expect(headers).toEqual({
         Authorization: "Bearer test-token",
@@ -323,7 +323,7 @@ describe("Auth Utilities", () => {
         },
       };
 
-      const headers = await createAuthHeaders(context);
+      const headers = await createHeaders(context);
 
       expect(headers.Authorization).toMatch(/^Basic /);
       expect(headers.Accept).toBe("application/json");
@@ -334,11 +334,12 @@ describe("Auth Utilities", () => {
     test("should return headers without Authorization when no auth configured", async () => {
       const context = { environment: {}, secrets: {} };
 
-      const headers = await createAuthHeaders(context);
+      const headers = await createHeaders(context);
 
       expect(headers).toEqual({
         Accept: "application/json",
         "Content-Type": "application/json",
+        "User-Agent": SGNL_USER_AGENT,
       });
       expect(headers.Authorization).toBeUndefined();
     });
